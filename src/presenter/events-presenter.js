@@ -9,21 +9,27 @@ class EventsPresenter {
   #eventsListComponent = null;
   #eventsItemContainer = null;
 
-  constructor({ eventsListContainer }) {
+  #eventsModel = null;
+  #events = null;
+
+  // eslint-disable-next-line no-shadow
+  constructor({ eventsListContainer, eventsModel }) {
     this.#eventsListContainer = eventsListContainer;
+    this.#eventsModel = eventsModel;
   }
 
   init() {
     this.#sortingComponent = new SortingView();
     this.#eventsListComponent = new EventsListView();
     this.#eventsItemContainer = this.#eventsListComponent.element;
+    this.#events = this.#eventsModel.events;
 
     render(this.#sortingComponent, this.#eventsListContainer);
     render(this.#eventsListComponent, this.#eventsListContainer);
 
-    for (let i = 0; i < 3; i++) {
-      render(new EventItemView(), this.#eventsItemContainer);
-    }
+    this.#events.forEach((event) => {
+      render(new EventItemView({ event }), this.#eventsItemContainer);
+    });
   }
 }
 

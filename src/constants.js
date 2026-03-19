@@ -14,7 +14,20 @@ const DATE_FORMATS = {
   TIME: 'HH:mm'
 };
 
+const TRIP_EVENT_TYPES = {
+  TAXI: 'taxi',
+  BUS: 'bus',
+  TRAIN: 'train',
+  SHIP: 'ship',
+  DRIVE: 'drive',
+  FLIGHT: 'flight',
+  CHECK_IN: 'check-in',
+  SIGHTSEEING: 'sightseeing',
+  RESTAURANT: 'restaurant'
+};
+
 export {
   TIME_UNITS,
   DATE_FORMATS,
+  TRIP_EVENT_TYPES
 };

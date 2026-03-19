@@ -60,9 +60,12 @@ const formatDuration = (dateFrom, dateTo) => {
   return `${minutes}M`;
 };
 
+const capitalizeWords = (str) => str.replace(/\b\p{L}/gu, (char) => char.toUpperCase());
+
 export {
   getRandomItems,
   formatDate,
   getTimeDiff,
-  formatDuration
+  formatDuration,
+  capitalizeWords
 };

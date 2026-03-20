@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view';
-import { TRIP_EVENT_TYPES } from '../constants';
-import { capitalizeFirstLetter, toSlug } from '../helpers';
+import { DATE_FORMATS, TRIP_EVENT_TYPES } from '../constants';
+import { capitalizeFirstLetter, formatDate, toSlug } from '../helpers';
 
 /*
 TODO:
@@ -37,129 +37,175 @@ const createDestinationsList = (destinations) => {
     return '';
   }
 
-  return `
-    <datalist id="destination-list-1">
-        ${destinations.map((dest) => `<option value="${dest.name}"></option>`).join('')}
-    </datalist>
-  `;
+  return destinations
+    .map((dest) => `<option value="${dest.name}"></option>`)
+    .join('');
 };
 
 const createOffersSectionTemplate = (offers, selectedOfferIds = []) => {
   if (!offers.length) {
-    return;
+    return '';
   }
 
   return `
     <section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
-      ${offers.map((offer) => `
-        <div class="event__available-offers">
+      <div class="event__available-offers">
+        ${offers.map((offer) => `
           <div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${toSlug(offer.title)}-1" type="checkbox" name="event-offer-luggage" ${selectedOfferIds.includes(offer.id) ? 'checked' : ''}>
+            <input
+              class="event__offer-checkbox visually-hidden"
+              id="event-offer-${toSlug(offer.title)}-1"
+              type="checkbox"
+              name="event-offer"
+              ${selectedOfferIds.includes(offer.id) ? 'checked' : ''}
+            >
             <label class="event__offer-label" for="event-offer-${toSlug(offer.title)}-1">
               <span class="event__offer-title">${offer.title}</span>
               +€&nbsp;
               <span class="event__offer-price">${offer.price}</span>
             </label>
-        </div>
-      `)}
+          </div>
+        `).join('')}
+      </div>
     </section>
   `;
 };
 
-const createEditFormTemplate = ({ type, offers, destinations }) => {
-  return (`
+const createDestinationPicturesListTemplate = (pictures) => {
+  if (!pictures.length) {
+    return '';
+  }
+
+  return `
+    <div class="event__photos-container">
+      <div class="event__photos-tape">
+        ${pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('')}
+      </div>
+    </div>
+  `
+};
+
+const createDestinationSectionTemplate = (destination) => {
+  if (!destination) {
+    return '';
+  }
+
+  return `
+    <section class="event__section event__section--destination">
+      <h3 class="event__section-title event__section-title--destination">${destination.name}</h3>
+      <p class="event__destination-description">${destination.description ?? ''}</p>
+      ${createDestinationPicturesListTemplate(destination.pictures ?? '')}
+    </section>
+  `;
+};
+
+const createEditFormTemplate = ({ event, offers, destinations }) => {
+  const selectedOfferIds = event.offers.map((offer) => offer.id);
+  
+  return `
     <li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
-            <label class="event__type  event__type-btn" for="event-type-toggle-1">
+            <label class="event__type event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
+              <img
+                class="event__type-icon"
+                width="17"
+                height="17"
+                src="img/icons/${event.type}.png"
+                alt="Event type icon"
+              >
             </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
-
+            <input class="event__type-toggle visually-hidden" id="event-type-toggle-1" type="checkbox">
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-                ${Object.values(TRIP_EVENT_TYPES).map((value) => createEventTypeItemTemplate(value, type)).join('')}
+                ${Object.values(TRIP_EVENT_TYPES).map((value) => createEventTypeItemTemplate(value, event.type)).join('')}
               </fieldset>
             </div>
           </div>
-
-          <div class="event__field-group  event__field-group--destination">
-            <label class="event__label  event__type-output" for="event-destination-1">
-              ${capitalizeFirstLetter(type)}
+          <div class="event__field-group event__field-group--destination">
+            <label class="event__label event__type-output" for="event-destination-1">
+              ${capitalizeFirstLetter(event.type)}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="" list="destination-list-1">
+            <input
+              class="event__input event__input--destination"
+              id="event-destination-1"
+              type="text"
+              name="event-destination"
+              list="destination-list-1"
+              value="${event.destination.name}"
+            >
             <datalist id="destination-list-1">
               ${createDestinationsList(destinations)}
             </datalist>
           </div>
-
-          <div class="event__field-group  event__field-group--time">
-            <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="19/03/19 00:00">
+          <div class="event__field-group event__field-group--time">
+            <input class="event__input event__input--time" type="text" name="event-start-time" value="${formatDate(event.dateFrom, DATE_FORMATS.DATE_TIME_INPUT)}">
             —
-            <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="19/03/19 00:00">
+            <input class="event__input event__input--time" type="text" name="event-end-time" value="${formatDate(event.dateTo, DATE_FORMATS.DATE_TIME_INPUT)}">
           </div>
-
-          <div class="event__field-group  event__field-group--price">
-            <label class="event__label" for="event-price-1">
-              <span class="visually-hidden">Price</span>
-              €
-            </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="">
+          <div class="event__field-group event__field-group--price">
+            <label class="event__label">€</label>
+            <input class="event__input event__input--price" type="text" name="event-price" value="${event.basePrice}">
           </div>
-
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Cancel</button>
+          <button class="event__save-btn btn btn--blue" type="submit">Save</button>
+          <button class="event__reset-btn" type="reset">Delete</button>
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Close event</span>
+          </button>
         </header>
         <section class="event__details">
-          ${createOffersSectionTemplate(offers)}
-
-          <section class="event__section  event__section--destination">
-            <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.</p>
-
-            <div class="event__photos-container">
-              <div class="event__photos-tape">
-                <img class="event__photo" src="img/photos/1.jpg" alt="Event photo">
-                <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
-                <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
-                <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
-                <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">
-              </div>
-            </div>
-          </section>
+          ${createOffersSectionTemplate(offers, selectedOfferIds)}
+          ${createDestinationSectionTemplate(event.destination)}
         </section>
       </form>
     </li>
-  `);
+  `;
 };
 
 class EventEditFormView extends AbstractView {
-  #type = null;
+  #event = null;
   #offers = null;
   #destinations = null;
 
-  constructor({ type, offers, destinations }) {
-    super();
+  #handleFormSubmit = null;
+  #handleCloseClick = null;
 
-    this.#type = type;
+  constructor({ event, offers, destinations, onFormSubmit, onCloseClick }) {
+    super();
+    this.#event = event;
     this.#offers = offers;
     this.#destinations = destinations;
+    this.#handleFormSubmit = onFormSubmit;
+    this.#handleCloseClick = onCloseClick;
+
+    this.element.querySelector('.event--edit')
+      .addEventListener('submit', this.#onFormSubmitHandler);
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#closeClickHandler);
   }
 
   get template() {
     return createEditFormTemplate({
-      type: this.#type,
+      event: this.#event,
       offers: this.#offers,
       destinations: this.#destinations
     });
   }
+
+  #onFormSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit();
+  };
+
+  #closeClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleCloseClick();
+  };
 }
 
 export {

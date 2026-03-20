@@ -9,6 +9,7 @@ const TIME_UNITS = {
 };
 
 const DATE_FORMATS = {
+  DATE_TIME_INPUT: 'DD/MM/YY HH:mm',
   SHORT_DATE: 'MMM DD',
   ISO_DATE: 'YYYY-MM-DD',
   TIME: 'HH:mm'

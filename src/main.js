@@ -1,6 +1,6 @@
 import FilterPresenter from './presenter/filter-presenter';
 import EventsPresenter from './presenter/events-presenter';
-import EventsModel from './model/eventsModel';
+import EventsModel from './model/events-model';
 
 const siteHeaderElement = document.querySelector('.page-header');
 const siteMainElement = document.querySelector('.page-main');

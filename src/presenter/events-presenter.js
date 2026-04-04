@@ -2,7 +2,7 @@ import { render, replace } from '../framework/render';
 import SortingView from '../view/sorting-view';
 import EventsListView from '../view/events-list-view';
 import EventItemView from '../view/event-item-view';
-import { EventEditFormView } from '../view/event-edit-form-view';
+import EventEditFormView from '../view/event-edit-form-view';
 
 class EventsPresenter {
   #eventsListContainer = null;

@@ -2,13 +2,6 @@ import AbstractView from '../framework/view/abstract-view';
 import { DATE_FORMATS, TRIP_EVENT_TYPES } from '../constants';
 import { capitalizeFirstLetter, formatDate, toSlug } from '../helpers';
 
-/*
-TODO:
- Нужно добавить динамическую подстановку кнопок.
- При добавлении события: "Сохранить" и "Отменить".
- При изменении события: "Сохранить" и "Удалить".
-*/
-
 const createEventTypeItemTemplate = (type, currentType) => {
   const checkedAttr = type === currentType ? 'checked' : '';
 
@@ -84,7 +77,7 @@ const createDestinationPicturesListTemplate = (pictures) => {
         ${pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('')}
       </div>
     </div>
-  `
+  `;
 };
 
 const createDestinationSectionTemplate = (destination) => {
@@ -103,7 +96,7 @@ const createDestinationSectionTemplate = (destination) => {
 
 const createEditFormTemplate = ({ event, offers, destinations }) => {
   const selectedOfferIds = event.offers.map((offer) => offer.id);
-  
+
   return `
     <li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -208,6 +201,4 @@ class EventEditFormView extends AbstractView {
   };
 }
 
-export {
-  EventEditFormView
-};
+export default EventEditFormView;

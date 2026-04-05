@@ -1,4 +1,4 @@
-const TIME_UNITS = {
+const TimeUnits = {
   SECOND: 'second',
   MINUTE: 'minute',
   HOUR: 'hour',
@@ -8,14 +8,14 @@ const TIME_UNITS = {
   YEAR: 'year',
 };
 
-const DATE_FORMATS = {
+const DateFormats = {
   DATE_TIME_INPUT: 'DD/MM/YY HH:mm',
   SHORT_DATE: 'MMM DD',
   ISO_DATE: 'YYYY-MM-DD',
   TIME: 'HH:mm'
 };
 
-const TRIP_EVENT_TYPES = {
+const TripEventTypes = {
   TAXI: 'taxi',
   BUS: 'bus',
   TRAIN: 'train',
@@ -27,8 +27,16 @@ const TRIP_EVENT_TYPES = {
   RESTAURANT: 'restaurant'
 };
 
+const FilterTypes = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PRESENT: 'present',
+  PAST: 'past'
+};
+
 export {
-  TIME_UNITS,
-  DATE_FORMATS,
-  TRIP_EVENT_TYPES
+  TimeUnits,
+  DateFormats,
+  TripEventTypes,
+  FilterTypes
 };

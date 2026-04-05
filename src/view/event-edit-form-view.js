@@ -1,6 +1,7 @@
 import AbstractView from '../framework/view/abstract-view';
-import { DATE_FORMATS, TRIP_EVENT_TYPES } from '../constants';
-import { capitalizeFirstLetter, formatDate, toSlug } from '../helpers';
+import { DateFormats, TripEventTypes } from '../constants';
+import { capitalizeFirstLetter, toSlug } from '../helpers/common';
+import { formatDate } from '../helpers/times';
 
 const createEventTypeItemTemplate = (type, currentType) => {
   const checkedAttr = type === currentType ? 'checked' : '';
@@ -116,7 +117,7 @@ const createEditFormTemplate = ({ event, offers, destinations }) => {
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-                ${Object.values(TRIP_EVENT_TYPES).map((value) => createEventTypeItemTemplate(value, event.type)).join('')}
+                ${Object.values(TripEventTypes).map((value) => createEventTypeItemTemplate(value, event.type)).join('')}
               </fieldset>
             </div>
           </div>
@@ -137,9 +138,9 @@ const createEditFormTemplate = ({ event, offers, destinations }) => {
             </datalist>
           </div>
           <div class="event__field-group event__field-group--time">
-            <input class="event__input event__input--time" type="text" name="event-start-time" value="${formatDate(event.dateFrom, DATE_FORMATS.DATE_TIME_INPUT)}">
+            <input class="event__input event__input--time" type="text" name="event-start-time" value="${formatDate(event.dateFrom, DateFormats.DATE_TIME_INPUT)}">
             —
-            <input class="event__input event__input--time" type="text" name="event-end-time" value="${formatDate(event.dateTo, DATE_FORMATS.DATE_TIME_INPUT)}">
+            <input class="event__input event__input--time" type="text" name="event-end-time" value="${formatDate(event.dateTo, DateFormats.DATE_TIME_INPUT)}">
           </div>
           <div class="event__field-group event__field-group--price">
             <label class="event__label">€</label>

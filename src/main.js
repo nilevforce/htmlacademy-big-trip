@@ -1,5 +1,5 @@
 import FilterPresenter from './presenter/filter-presenter';
-import EventsPresenter from './presenter/events-presenter';
+import BoardPresenter from './presenter/board-presenter';
 import EventsModel from './model/events-model';
 import NewEventButtonView from './view/new-event-button-view';
 import { render } from './framework/render';
@@ -18,7 +18,7 @@ const filterPresenter = new FilterPresenter({
   filters: generateFilter(eventsModel.events)
 });
 
-const eventsPresenter = new EventsPresenter({
+const eventsPresenter = new BoardPresenter({
   eventsListContainer: eventsListContainerElement,
   eventsModel
 });

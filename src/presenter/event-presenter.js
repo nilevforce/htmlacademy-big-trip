@@ -1,8 +1,16 @@
 import EventItemView from '../view/event-item-view';
 import EventEditFormView from '../view/event-edit-form-view';
-import { render, replace } from '../framework/render';
+import { remove, render, replace } from '../framework/render';
+
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
 
 class EventPresenter {
+  #handleDataChange = null;
+  #handleModeChange = null;
+
   #eventsListContainer = null;
   #eventComponent = null;
   #eventEditComponent = null;
@@ -11,8 +19,12 @@ class EventPresenter {
   #offers = null;
   #destinations = null;
 
-  constructor({ eventsListContainer }) {
+  #mode = Mode.DEFAULT;
+
+  constructor({ eventsListContainer, onDataChange, onModeChange }) {
     this.#eventsListContainer = eventsListContainer;
+    this.#handleDataChange = onDataChange;
+    this.#handleModeChange = onModeChange;
   }
 
   init({ event, offers, destinations }) {
@@ -20,9 +32,13 @@ class EventPresenter {
     this.#offers = offers;
     this.#destinations = destinations;
 
+    const prevEventComponent = this.#eventComponent;
+    const prevEventEditComponent = this.#eventEditComponent;
+
     this.#eventComponent = new EventItemView({
       event: this.#event,
-      onEditClick: this.#onEditClick
+      onEditClick: this.#handleEditClick,
+      onFavoriteClick: this.#handleFavoriteClick
     });
 
     this.#eventEditComponent = new EventEditFormView({
@@ -30,20 +46,48 @@ class EventPresenter {
       offers: this.#offers,
       destinations: this.#destinations,
       onFormSubmit: this.#handleFormSubmit,
-      onCloseClick: this.#onCloseClick
+      onCloseClick: this.#handleCloseClick
     });
 
-    render(this.#eventComponent, this.#eventsListContainer);
+    if (prevEventComponent === null || prevEventEditComponent === null) {
+      render(this.#eventComponent, this.#eventsListContainer);
+      return;
+    }
+
+    if (this.#eventsListContainer.contains(prevEventComponent.element)) {
+      replace(this.#eventComponent, prevEventComponent);
+    }
+
+    if (this.#eventsListContainer.contains(prevEventEditComponent.element)) {
+      replace(this.#eventEditComponent, prevEventEditComponent);
+    }
+
+    remove(prevEventComponent);
+    remove(prevEventEditComponent);
+  }
+
+  destroy() {
+    remove(this.#eventComponent);
+    remove(this.#eventEditComponent);
+  }
+
+  resetView() {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#replaceFormToCard();
+    }
   }
 
   #replaceCardToForm() {
     replace(this.#eventEditComponent, this.#eventComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#handleModeChange();
+    this.#mode = Mode.EDITING;
   }
 
   #replaceFormToCard() {
     replace(this.#eventComponent, this.#eventEditComponent);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#mode = Mode.DEFAULT;
   }
 
   #escKeyDownHandler(evt) {
@@ -54,15 +98,20 @@ class EventPresenter {
     }
   }
 
-  #onEditClick = () => {
+  #handleEditClick = () => {
     this.#replaceCardToForm();
   };
 
-  #handleFormSubmit = () => {
-    this.#replaceFormToCard();
+  #handleFavoriteClick = () => {
+    this.#handleDataChange({ ...this.#event, isFavorite: !this.#event.isFavorite });
   };
 
-  #onCloseClick = () => {
+  #handleFormSubmit = (event) => {
+    this.#replaceFormToCard();
+    this.#handleDataChange(event);
+  };
+
+  #handleCloseClick = () => {
     this.#replaceFormToCard();
   };
 }

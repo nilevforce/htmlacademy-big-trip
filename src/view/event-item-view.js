@@ -18,6 +18,7 @@ const createOffersTemplate = (offers) => {
 
 const createItemTemplate = (event) => {
   const {
+    id,
     type,
     dateFrom,
     dateTo,
@@ -46,7 +47,7 @@ const createItemTemplate = (event) => {
 
   return (`
     <li class="trip-events__item">
-      <div class="event">
+      <div class="event" data-js-event-id="${id}">
         <time class="event__date" datetime="${dateFromIsoDate}">${dateFromShortDate}</time>
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
@@ -84,14 +85,19 @@ const createItemTemplate = (event) => {
 class EventItemView extends AbstractView {
   #event = null;
   #handleEditClick = null;
+  #handleFavoriteClick = null;
 
-  constructor({ event, onEditClick }) {
+  constructor({ event, onEditClick, onFavoriteClick }) {
     super();
     this.#event = event;
     this.#handleEditClick = onEditClick;
+    this.#handleFavoriteClick = onFavoriteClick;
 
     this.element.querySelector('.event__rollup-btn')
       .addEventListener('click', this.#editClickHandler);
+
+    this.element.querySelector('.event__favorite-btn')
+      .addEventListener('click', this.#favoriteClickHandler);
   }
 
   get template() {
@@ -101,6 +107,11 @@ class EventItemView extends AbstractView {
   #editClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleEditClick();
+  };
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFavoriteClick();
   };
 }
 

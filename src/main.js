@@ -18,11 +18,11 @@ const filterPresenter = new FilterPresenter({
   filters: generateFilter(eventsModel.events)
 });
 
-const eventsPresenter = new BoardPresenter({
+const boardPresenter = new BoardPresenter({
   eventsListContainer: eventsListContainerElement,
   eventsModel
 });
 
 render(new NewEventButtonView(), tripMainElement);
 filterPresenter.init();
-eventsPresenter.init();
+boardPresenter.init();

@@ -34,9 +34,19 @@ const FilterTypes = {
   PAST: 'past'
 };
 
+const SortTypes = {
+  DEFAULT: 'DEFAULT',
+  DAY: 'DAY',
+  EVENT: 'EVENT',
+  TIME: 'TIME',
+  PRICE: 'PRICE',
+  OFFERS: 'OFFERS'
+};
+
 export {
   TimeUnits,
   DateFormats,
   TripEventTypes,
-  FilterTypes
+  FilterTypes,
+  SortTypes,
 };

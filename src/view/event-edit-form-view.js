@@ -193,7 +193,7 @@ class EventEditFormView extends AbstractView {
 
   #onFormSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit();
+    this.#handleFormSubmit(this.#event);
   };
 
   #closeClickHandler = (evt) => {

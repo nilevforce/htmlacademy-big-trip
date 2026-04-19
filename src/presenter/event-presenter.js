@@ -73,6 +73,7 @@ class EventPresenter {
 
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
+      this.#eventEditComponent.reset(this.#event);
       this.#replaceFormToCard();
     }
   }
@@ -90,13 +91,12 @@ class EventPresenter {
     this.#mode = Mode.DEFAULT;
   }
 
-  #escKeyDownHandler(evt) {
+  #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
-      this.#replaceFormToCard();
-      document.removeEventListener('keydown', this.#escKeyDownHandler);
+      this.#handleCloseClick();
     }
-  }
+  };
 
   #handleEditClick = () => {
     this.#replaceCardToForm();
@@ -112,6 +112,7 @@ class EventPresenter {
   };
 
   #handleCloseClick = () => {
+    this.#eventEditComponent.reset(this.#event);
     this.#replaceFormToCard();
   };
 }

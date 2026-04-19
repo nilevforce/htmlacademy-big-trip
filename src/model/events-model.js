@@ -3,23 +3,9 @@ import { offersMock } from '../mock/offers-mock';
 import { destinationsMock } from '../mock/destinations-mock';
 
 class EventsModel {
-  #events = structuredClone(eventsMock);
-  #offers = structuredClone(offersMock);
-  #destinations = structuredClone(destinationsMock);
-
-  getEventOffers(type, selectedOfferIds) {
-    const offersForType = this.#offers
-      .find((offer) => offer.type === type)
-      ?.offers ?? [];
-
-    return offersForType.filter((offer) =>
-      selectedOfferIds.includes(offer.id)
-    );
-  }
-
-  getDestinationById(id) {
-    return this.#destinations.find((dest) => dest.id === id);
-  }
+  #events = eventsMock;
+  #offers = offersMock;
+  #destinations = destinationsMock;
 
   get events() {
     return this.#events.map((event) => ({
@@ -27,21 +13,35 @@ class EventsModel {
       basePrice: event.basePrice,
       dateFrom: event.dateFrom,
       dateTo: event.dateTo,
-      destination: this.getDestinationById(event.destination),
+      destination: this.#getDestinationById(event.destination),
       isFavorite: event.isFavorite,
-      offers: this.getEventOffers(event.type, event.offers),
+      offers: this.#getSelectedOffersByType(event.type, event.offers),
       type: event.type
     }));
   }
 
-  getOffersByType(type) {
-    return this.#offers
-      .find((offer) => offer.type === type)
-      ?.offers;
+  get offers() {
+    return this.#offers;
   }
 
   get destinations() {
     return this.#destinations;
+  }
+
+  getOffersByType(type) {
+    return this.#offers.find((offer) => offer.type === type)?.offers ?? [];
+  }
+
+  #getSelectedOffersByType(type, selectedOfferIds) {
+    const offersForType = this.getOffersByType(type);
+
+    return offersForType.filter((offer) =>
+      selectedOfferIds.includes(offer.id)
+    );
+  }
+
+  #getDestinationById(id) {
+    return this.#destinations.find((destination) => destination.id === id);
   }
 }
 

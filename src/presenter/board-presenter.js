@@ -68,7 +68,7 @@ class BoardPresenter {
 
     eventPresenter.init({
       event,
-      offers: this.#eventsModel.getOffersByType(event.type),
+      offers: this.#eventsModel.offers,
       destinations: this.#destinations,
     });
 
@@ -79,7 +79,7 @@ class BoardPresenter {
     this.#events = updateItem(this.#events, updatedEvent);
     this.#eventsPresenters.get(updatedEvent.id).init({
       event: updatedEvent,
-      offers: this.#eventsModel.getOffersByType(updatedEvent.type),
+      offers: this.#eventsModel.offers,
       destinations: this.#destinations
     });
   };

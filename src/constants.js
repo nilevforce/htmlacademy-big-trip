@@ -43,10 +43,24 @@ const SortTypes = {
   OFFERS: 'OFFERS'
 };
 
+const UserActions = {
+  ADD_EVENT: 'ADD_EVENT',
+  UPDATE_EVENT: 'UPDATE_EVENT',
+  DELETE_EVENT: 'DELETE_EVENT'
+};
+
+const UpdateTypes = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR'
+}
+
 export {
   TimeUnits,
   DateFormats,
   TripEventTypes,
   FilterTypes,
   SortTypes,
+  UserActions,
+  UpdateTypes
 };

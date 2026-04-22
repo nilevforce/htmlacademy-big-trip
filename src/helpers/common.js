@@ -42,12 +42,7 @@ const toSlug = (str) => {
     .replace(/-+/g, '-');
 };
 
-const updateItem = (items, update) => {
-  return items.map((item) => item.id === update.id ? update : item);
-};
-
 export {
-  updateItem,
   getRandomItems,
   capitalizeWords,
   capitalizeFirstLetter,

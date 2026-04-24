@@ -3,7 +3,7 @@ import BoardPresenter from './presenter/board-presenter';
 import EventsModel from './model/events-model';
 import NewEventButtonView from './view/new-event-button-view';
 import { render } from './framework/render';
-import { generateFilter } from './mock/filter-mock';
+import FilterModel from './model/filter-model';
 
 const siteHeaderElement = document.querySelector('.page-header');
 const siteMainElement = document.querySelector('.page-main');
@@ -12,15 +12,18 @@ const filterContainerElement = siteHeaderElement.querySelector('.trip-controls__
 const eventsListContainerElement = siteMainElement.querySelector('.trip-events');
 
 const eventsModel = new EventsModel();
+const filterModel = new FilterModel();
 
 const filterPresenter = new FilterPresenter({
   filterContainer: filterContainerElement,
-  filters: generateFilter(eventsModel.events)
+  filterModel,
+  eventsModel
 });
 
 const boardPresenter = new BoardPresenter({
   eventsListContainer: eventsListContainerElement,
-  eventsModel
+  eventsModel,
+  filterModel
 });
 
 render(new NewEventButtonView(), tripMainElement);

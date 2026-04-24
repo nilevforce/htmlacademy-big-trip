@@ -1,7 +1,7 @@
 import { FilterTypes } from '../constants';
 import { isDateInFuture, isDateInPast, isNowBetweenDates } from './times';
 
-const filters = {
+const filter = {
   [FilterTypes.EVERYTHING]: (events) => events,
   [FilterTypes.FUTURE]: (events) => events.filter((event) => isDateInFuture(event.dateFrom)),
   [FilterTypes.PRESENT]: (events) => events.filter((event) => isNowBetweenDates(event.dateFrom, event.dateTo)),
@@ -9,5 +9,5 @@ const filters = {
 };
 
 export {
-  filters
+  filter
 };

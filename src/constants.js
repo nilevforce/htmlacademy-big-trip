@@ -35,7 +35,7 @@ const FilterTypes = {
 };
 
 const SortTypes = {
-  DEFAULT: 'DEFAULT',
+  DEFAULT: 'DAY',
   DAY: 'DAY',
   EVENT: 'EVENT',
   TIME: 'TIME',

@@ -4,36 +4,46 @@ import EventsListView from '../view/events-list-view';
 import EventPresenter from './event-presenter';
 import { SortTypes, UpdateTypes, UserActions } from '../constants';
 import { sortEventsByDay, sortEventsByPrice, sortEventsByTime } from '../helpers/sorting';
+import { filter } from '../helpers/filter';
+import NoEventsView from '../view/no-events-view';
 
 class BoardPresenter {
   #eventsListContainer = null;
   #sortingComponent = null;
   #eventsListComponent = new EventsListView();
+  #noEventsComponent = null;
 
   #eventsModel = null;
+  #filterModel = null;
 
   #currentSortType = SortTypes.DEFAULT;
 
   #eventsPresenters = new Map();
 
-  constructor({ eventsListContainer, eventsModel }) {
+  constructor({ eventsListContainer, eventsModel, filterModel }) {
     this.#eventsListContainer = eventsListContainer;
     this.#eventsModel = eventsModel;
+    this.#filterModel = filterModel;
 
     this.#eventsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get events() {
+    const events = this.#eventsModel.events;
+    const filterType = this.#filterModel.filter;
+    const filteredEvents = filter[filterType](events);
+
     switch (this.#currentSortType) {
       case SortTypes.DAY:
-        return [...this.#eventsModel.events].sort(sortEventsByDay);
+        return filteredEvents.sort(sortEventsByDay);
       case SortTypes.TIME:
-        return [...this.#eventsModel.events].sort(sortEventsByTime);
+        return filteredEvents.sort(sortEventsByTime);
       case SortTypes.PRICE:
-        return [...this.#eventsModel.events].sort(sortEventsByPrice);
+        return filteredEvents.sort(sortEventsByPrice);
     }
 
-    return [...this.#eventsModel.events];
+    return filteredEvents;
   }
 
   get destinations() {
@@ -50,6 +60,15 @@ class BoardPresenter {
 
   #renderBoard() {
     render(this.#eventsListComponent, this.#eventsListContainer);
+
+    const events = this.events;
+    const eventsCount = events.length;
+
+    if (eventsCount === 0) {
+      this.#renderNoEvents();
+      return;
+    }
+
     this.#renderSort();
     this.#renderEvents();
   }
@@ -60,6 +79,10 @@ class BoardPresenter {
 
     if (resetSortType) {
       this.#currentSortType = SortTypes.DEFAULT;
+    }
+
+    if (this.#noEventsComponent) {
+      remove(this.#noEventsComponent);
     }
 
     remove(this.#sortingComponent);
@@ -94,6 +117,14 @@ class BoardPresenter {
     });
 
     this.#eventsPresenters.set(event.id, eventPresenter);
+  }
+
+  #renderNoEvents() {
+    this.#noEventsComponent = new NoEventsView({
+      filterType: this.#filterModel.filter
+    });
+
+    render(this.#noEventsComponent, this.#eventsListContainer, RenderPosition.AFTERBEGIN);
   }
 
   #handleModeChange = () => {

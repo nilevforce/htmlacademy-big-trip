@@ -55,11 +55,13 @@ class BoardPresenter {
   }
 
   #clearBoard({ resetSortType = false } = {}) {
+    this.#eventsPresenters.forEach((presenter) => presenter.destroy());
+    this.#eventsPresenters.clear();
+
     if (resetSortType) {
       this.#currentSortType = SortTypes.DEFAULT;
     }
 
-    this.#clearEventsList();
     remove(this.#sortingComponent);
   }
 
@@ -76,11 +78,6 @@ class BoardPresenter {
     this.events.forEach((event) => {
       this.#renderEvent(event);
     });
-  }
-
-  #clearEventsList() {
-    this.#eventsPresenters.forEach((presenter) => presenter.destroy());
-    this.#eventsPresenters.clear();
   }
 
   #renderEvent(event) {
@@ -144,8 +141,8 @@ class BoardPresenter {
 
     this.#currentSortType = SortTypes[sortType];
 
-    this.#clearEventsList();
-    this.#renderEvents();
+    this.#clearBoard();
+    this.#renderBoard();
   };
 }
 

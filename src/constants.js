@@ -35,7 +35,6 @@ const FilterTypes = {
 };
 
 const SortTypes = {
-  DEFAULT: 'DAY',
   DAY: 'DAY',
   EVENT: 'EVENT',
   TIME: 'TIME',
@@ -53,7 +52,7 @@ const UpdateTypes = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR'
-}
+};
 
 export {
   TimeUnits,

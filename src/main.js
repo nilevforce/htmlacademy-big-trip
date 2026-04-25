@@ -23,9 +23,23 @@ const filterPresenter = new FilterPresenter({
 const boardPresenter = new BoardPresenter({
   eventsListContainer: eventsListContainerElement,
   eventsModel,
-  filterModel
+  filterModel,
+  onNewEventDestroy: handleNewEventFormClose
 });
 
-render(new NewEventButtonView(), tripMainElement);
+const newEventButtonComponent = new NewEventButtonView({
+  onClick: handleNewEventButtonClick
+});
+
+function handleNewEventFormClose() {
+  newEventButtonComponent.element.disabled = false;
+}
+
+function handleNewEventButtonClick() {
+  boardPresenter.createEvent();
+  newEventButtonComponent.element.disabled = true;
+}
+
+render(newEventButtonComponent, tripMainElement);
 filterPresenter.init();
 boardPresenter.init();

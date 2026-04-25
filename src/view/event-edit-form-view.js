@@ -5,6 +5,17 @@ import { DateFormats, TripEventTypes } from '../constants';
 import { capitalizeFirstLetter, toSlug } from '../helpers/common';
 import { formatDate } from '../helpers/times';
 
+const BLANK_EVENT = {
+  id: null,
+  basePrice: 0,
+  dateFrom: null,
+  dateTo: null,
+  destination: null,
+  isFavorite: false,
+  offers: [],
+  type: TripEventTypes.FLIGHT
+};
+
 const createEventTypeItemTemplate = (type, currentType) => {
   const checkedAttr = type === currentType ? 'checked' : '';
 
@@ -98,8 +109,14 @@ const createDestinationSectionTemplate = (destination) => {
   `;
 };
 
-const createEditFormTemplate = ({ event, offers, destinations }) => {
-  const selectedOfferIds = event.offers.map((offer) => offer.id);
+const createEditFormTemplate = ({
+  event,
+  offers,
+  destinations,
+} = {}) => {
+  const selectedOfferIds = event.offers?.map((offer) => offer.id);
+  const isEdit = !!event.id;
+  const resetButtonName = isEdit ? 'Delete' : 'Cancel';
 
   return `
     <li class="trip-events__item">
@@ -134,26 +151,44 @@ const createEditFormTemplate = ({ event, offers, destinations }) => {
               type="text"
               name="event-destination"
               list="destination-list-1"
-              value="${event.destination.name}"
+              value="${event.destination?.name ? event.destination.name : ''}"
+              required
             >
             <datalist id="destination-list-1">
               ${createDestinationsList(destinations)}
             </datalist>
           </div>
           <div class="event__field-group event__field-group--time">
-            <input class="event__input event__input--time" type="text" name="event-start-time" value="${formatDate(event.dateFrom, DateFormats.DATE_TIME_INPUT)}">
+            <input
+              class="event__input event__input--time"
+              type="text"
+              name="event-start-time"
+              value="${event.dateFrom ? formatDate(event.dateFrom, DateFormats.DATE_TIME_INPUT) : ''}"
+              required
+            >
             —
-            <input class="event__input event__input--time" type="text" name="event-end-time" value="${formatDate(event.dateTo, DateFormats.DATE_TIME_INPUT)}">
+            <input
+              class="event__input event__input--time"
+              type="text"
+              name="event-end-time"
+              value="${event.dateTo ? formatDate(event.dateTo, DateFormats.DATE_TIME_INPUT) : ''}"
+              required
+            >
           </div>
           <div class="event__field-group event__field-group--price">
             <label class="event__label">€</label>
-            <input class="event__input event__input--price" type="text" name="event-price" value="${event.basePrice}">
+            <input
+              class="event__input event__input--price"
+              type="number"
+              name="event-price"
+              value="${event.basePrice ? event.basePrice : 0}"
+              min="0"
+              required
+            >
           </div>
           <button class="event__save-btn btn btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
-          <button class="event__rollup-btn" type="button">
-            <span class="visually-hidden">Close event</span>
-          </button>
+          <button class="event__reset-btn" type="reset">${resetButtonName}</button>
+          ${isEdit ? '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Close event</span></button>' : ''}
         </header>
         <section class="event__details">
           ${createOffersSectionTemplate(offers, selectedOfferIds)}
@@ -176,7 +211,14 @@ class EventEditFormView extends AbstractStatefulView {
   #datepickerFrom = null;
   #datepickerTo = null;
 
-  constructor({ event, offers, destinations, onFormSubmit, onCloseClick, onDeleteClick }) {
+  constructor({
+    event = BLANK_EVENT,
+    offers,
+    destinations,
+    onFormSubmit,
+    onCloseClick,
+    onDeleteClick
+  } = {}) {
     super();
 
     this.#event = event;
@@ -199,8 +241,10 @@ class EventEditFormView extends AbstractStatefulView {
     this.element.querySelector('.event--edit')
       .addEventListener('reset', this.#formResetHandler);
 
-    this.element.querySelector('.event__rollup-btn')
-      .addEventListener('click', this.#closeClickHandler);
+    const rollupButton = this.element.querySelector('.event__rollup-btn');
+    if (rollupButton) {
+      rollupButton.addEventListener('click', this.#closeClickHandler);
+    }
 
     this.element.querySelector('.event__type-group')
       .addEventListener('change', this.#typeChangeHandler);
@@ -275,7 +319,7 @@ class EventEditFormView extends AbstractStatefulView {
     );
 
     if (!selectedDest) {
-      evt.target.value = this._state.destination?.name ?? this.#event.destination.name;
+      evt.target.value = this._state.destination?.name ?? '';
       return;
     }
 
@@ -339,30 +383,24 @@ class EventEditFormView extends AbstractStatefulView {
   };
 
   #setDatepicker() {
-    if (this._state?.dateFrom) {
-      this.#datepickerFrom = flatpickr(
-        this.element.querySelector('[name="event-start-time"]'),
-        {
-          enableTime: true,
-          dateFormat: 'd/m/y H:i',
-          defaultDate: this._state.dateFrom,
-          onChange: this.#dateFromChangeHandler,
-        },
-      );
-    }
+    this.#datepickerFrom = flatpickr(
+      this.element.querySelector('[name="event-start-time"]'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/y H:i',
+        onChange: this.#dateFromChangeHandler,
+      },
+    );
 
-    if (this._state?.dateTo) {
-      this.#datepickerTo = flatpickr(
-        this.element.querySelector('[name="event-end-time"]'),
-        {
-          enableTime: true,
-          dateFormat: 'd/m/y H:i',
-          defaultDate: this._state.dateTo,
-          minDate: this._state.dateFrom,
-          onChange: this.#dateToChangeHandler,
-        },
-      );
-    }
+    this.#datepickerTo = flatpickr(
+      this.element.querySelector('[name="event-end-time"]'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/y H:i',
+        minDate: this._state.dateFrom,
+        onChange: this.#dateToChangeHandler,
+      },
+    );
   }
 
   #destroyDatepickers() {

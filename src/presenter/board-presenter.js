@@ -2,10 +2,11 @@ import { remove, render, RenderPosition } from '../framework/render';
 import SortingView from '../view/sorting-view';
 import EventsListView from '../view/events-list-view';
 import EventPresenter from './event-presenter';
-import { SortTypes, UpdateTypes, UserActions } from '../constants';
+import { FilterTypes, SortTypes, UpdateTypes, UserActions } from '../constants';
 import { sortEventsByDay, sortEventsByPrice, sortEventsByTime } from '../helpers/sorting';
 import { filter } from '../helpers/filter';
 import NoEventsView from '../view/no-events-view';
+import NewEventPresenter from './new-event-presenter';
 
 class BoardPresenter {
   #eventsListContainer = null;
@@ -16,14 +17,26 @@ class BoardPresenter {
   #eventsModel = null;
   #filterModel = null;
 
-  #currentSortType = SortTypes.DEFAULT;
+  #currentSortType = SortTypes.DAY;
 
+  #newEventPresenter = null;
   #eventsPresenters = new Map();
 
-  constructor({ eventsListContainer, eventsModel, filterModel }) {
+  constructor({
+    eventsListContainer,
+    eventsModel,
+    filterModel,
+    onNewEventDestroy
+  }) {
     this.#eventsListContainer = eventsListContainer;
     this.#eventsModel = eventsModel;
     this.#filterModel = filterModel;
+
+    this.#newEventPresenter = new NewEventPresenter({
+      eventListContainer: this.#eventsListComponent.element,
+      onDataChange: this.#handleViewAction,
+      onDestroy: onNewEventDestroy
+    });
 
     this.#eventsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -41,9 +54,9 @@ class BoardPresenter {
         return filteredEvents.sort(sortEventsByTime);
       case SortTypes.PRICE:
         return filteredEvents.sort(sortEventsByPrice);
+      default:
+        return filteredEvents.sort(sortEventsByDay);
     }
-
-    return filteredEvents;
   }
 
   get destinations() {
@@ -56,6 +69,15 @@ class BoardPresenter {
 
   init() {
     this.#renderBoard();
+  }
+
+  createEvent() {
+    this.#currentSortType = SortTypes.DAY;
+    this.#filterModel.setFilter(UpdateTypes.MAJOR, FilterTypes.EVERYTHING);
+    this.#newEventPresenter.init({
+      offers: this.offers,
+      destinations: this.destinations
+    });
   }
 
   #renderBoard() {
@@ -78,7 +100,7 @@ class BoardPresenter {
     this.#eventsPresenters.clear();
 
     if (resetSortType) {
-      this.#currentSortType = SortTypes.DEFAULT;
+      this.#currentSortType = SortTypes.DAY;
     }
 
     if (this.#noEventsComponent) {
@@ -128,6 +150,7 @@ class BoardPresenter {
   }
 
   #handleModeChange = () => {
+    this.#newEventPresenter.destroy();
     this.#eventsPresenters.forEach((presenter) => presenter.resetView());
   };
 

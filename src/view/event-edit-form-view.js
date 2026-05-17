@@ -1,3 +1,4 @@
+import he from 'he';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
@@ -151,7 +152,7 @@ const createEditFormTemplate = ({
               type="text"
               name="event-destination"
               list="destination-list-1"
-              value="${event.destination?.name ? event.destination.name : ''}"
+              value="${event.destination?.name ? he.encode(event.destination.name) : ''}"
               required
             >
             <datalist id="destination-list-1">

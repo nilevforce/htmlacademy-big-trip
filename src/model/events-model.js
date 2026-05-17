@@ -48,53 +48,71 @@ class EventsModel extends Observable {
     return this.#destinations;
   }
 
-  updateEvent(updateType, update) {
+  async updateEvent(updateType, update) {
     const index = this.#events.findIndex((event) => event.id === update.id);
 
     if (index === -1) {
-      throw new Error('Can\'t update unexisting task');
+      throw new Error('Can\'t update unexisting event');
     }
 
-    const rawUpdate = {
-      ...update,
-      destination: update.destination.id,
-      offers: update.offers.map((offer) => offer.id)
-    };
+    try {
+      const rawUpdate = {
+        ...update,
+        destination: update.destination.id,
+        offers: update.offers.map((offer) => offer.id)
+      };
 
-    this.#events = [
-      ...this.#events.slice(0, index),
-      rawUpdate,
-      ...this.#events.slice(index + 1)
-    ];
+      const updatedEvent = await this.#eventsApiService.updateEvent(rawUpdate);
 
-    this._notify(updateType, update);
+      this.#events = [
+        ...this.#events.slice(0, index),
+        updatedEvent,
+        ...this.#events.slice(index + 1)
+      ];
+
+      this._notify(updateType, update);
+    } catch (e) {
+      throw new Error('Can\'t update event');
+    }
   }
 
-  addEvent(updateType, update) {
-    const rawUpdate = {
-      ...update,
-      destination: update.destination.id,
-      offers: update.offers.map((offer) => offer.id)
-    };
+  async addEvent(updateType, update) {
+    try {
+      const rawCreate = {
+        ...update,
+        destination: update.destination.id,
+        offers: update.offers.map((offer) => offer.id)
+      };
 
-    this.#events = [rawUpdate, ...this.#events];
+      const createdEvent = await this.#eventsApiService.addEvent(rawCreate);
 
-    this._notify(updateType, update);
+      this.#events = [createdEvent, ...this.#events];
+
+      this._notify(updateType, update);
+    } catch (e) {
+      throw new Error('Can\'t create event');
+    }
   }
 
-  deleteEvent(updateType, update) {
+  async deleteEvent(updateType, update) {
     const index = this.#events.findIndex((event) => event.id === update.id);
 
     if (index === -1) {
-      throw new Error('Can\'t delete unexisting task');
+      throw new Error('Can\'t delete unexisting event');
     }
 
-    this.#events = [
-      ...this.#events.slice(0, index),
-      ...this.#events.slice(index + 1)
-    ];
+    try {
+      await this.#eventsApiService.deleteEvent(update.id);
 
-    this._notify(updateType, update);
+      this.#events = [
+        ...this.#events.slice(0, index),
+        ...this.#events.slice(index + 1)
+      ];
+
+      this._notify(updateType, update);
+    } catch (e) {
+      throw new Error('Can\'t delete event');
+    }
   }
 
   #getOffersByType(type) {

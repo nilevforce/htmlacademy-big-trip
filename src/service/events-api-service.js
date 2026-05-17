@@ -35,6 +35,39 @@ class EventsApiService extends ApiService {
     return offers.map((offer) => this.#adaptOfferToClient(offer));
   }
 
+  async updateEvent(event) {
+    const response = await this._load({
+      url: `${ApiEndpoints.POINTS}/${event.id}`,
+      method: ApiMethods.PUT,
+      body: JSON.stringify(this.#adaptEventToServer(event)),
+      headers: new Headers({'Content-Type': 'application/json'})
+    });
+
+    const updatedEvent = await ApiService.parseResponse(response);
+
+    return this.#adaptEventToClient(updatedEvent);
+  }
+
+  async addEvent(event) {
+    const response = await this._load({
+      url: ApiEndpoints.POINTS,
+      method: ApiMethods.POST,
+      body: JSON.stringify(this.#adaptEventToServer(event)),
+      headers: new Headers({'Content-Type': 'application/json'})
+    });
+
+    const createdEvent = await ApiService.parseResponse(response);
+
+    return this.#adaptEventToClient(createdEvent);
+  }
+
+  async deleteEvent(eventId) {
+    return await this._load({
+      url: `${ApiEndpoints.POINTS}/${eventId}`,
+      method: ApiMethods.DELETE,
+    });
+  }
+
   #adaptEventToClient(event) {
     return {
       'id': event.id,
@@ -43,6 +76,18 @@ class EventsApiService extends ApiService {
       'dateTo': event.date_to,
       'destination': event.destination,
       'isFavorite': event.is_favorite,
+      'offers': event.offers,
+      'type': event.type
+    };
+  }
+
+  #adaptEventToServer(event) {
+    return {
+      'base_price': event.basePrice,
+      'date_from': event.dateFrom,
+      'date_to': event.dateTo,
+      'destination': event.destination,
+      'is_favorite': event.isFavorite,
       'offers': event.offers,
       'type': event.type
     };

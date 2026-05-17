@@ -4,6 +4,7 @@ import EventsModel from './model/events-model';
 import NewEventButtonView from './view/new-event-button-view';
 import { render } from './framework/render';
 import FilterModel from './model/filter-model';
+import EventsApiService from './services/events-api-service.js';
 
 const siteHeaderElement = document.querySelector('.page-header');
 const siteMainElement = document.querySelector('.page-main');
@@ -11,35 +12,45 @@ const tripMainElement = siteHeaderElement.querySelector('.trip-main');
 const filterContainerElement = siteHeaderElement.querySelector('.trip-controls__filters');
 const eventsListContainerElement = siteMainElement.querySelector('.trip-events');
 
-const eventsModel = new EventsModel();
-const filterModel = new FilterModel();
+const AUTHORIZATION = 'Basic hS2afz41wcl1sa2j';
+const BASE_API_URL = 'https://24.objects.htmlacademy.pro/big-trip';
 
-const filterPresenter = new FilterPresenter({
-  filterContainer: filterContainerElement,
-  filterModel,
-  eventsModel
-});
+const bootstrap = async () => {
+  const eventsModel = new EventsModel({
+    eventsApiService: new EventsApiService(BASE_API_URL, AUTHORIZATION)
+  });
 
-const boardPresenter = new BoardPresenter({
-  eventsListContainer: eventsListContainerElement,
-  eventsModel,
-  filterModel,
-  onNewEventDestroy: handleNewEventFormClose
-});
+  const filterModel = new FilterModel();
 
-const newEventButtonComponent = new NewEventButtonView({
-  onClick: handleNewEventButtonClick
-});
+  new FilterPresenter({
+    filterContainer: filterContainerElement,
+    filterModel,
+    eventsModel
+  });
 
-function handleNewEventFormClose() {
-  newEventButtonComponent.element.disabled = false;
-}
+  const boardPresenter = new BoardPresenter({
+    eventsListContainer: eventsListContainerElement,
+    eventsModel,
+    filterModel,
+    onNewEventDestroy: handleNewEventFormClose
+  });
 
-function handleNewEventButtonClick() {
-  boardPresenter.createEvent();
-  newEventButtonComponent.element.disabled = true;
-}
+  const newEventButtonComponent = new NewEventButtonView({
+    onClick: handleNewEventButtonClick
+  });
 
-render(newEventButtonComponent, tripMainElement);
-filterPresenter.init();
-boardPresenter.init();
+  function handleNewEventFormClose() {
+    newEventButtonComponent.element.disabled = false;
+  }
+
+  function handleNewEventButtonClick() {
+    boardPresenter.createEvent();
+    newEventButtonComponent.element.disabled = true;
+  }
+
+  render(newEventButtonComponent, tripMainElement);
+
+  await eventsModel.init();
+};
+
+bootstrap();

@@ -185,6 +185,9 @@ class BoardPresenter {
         this.#clearBoard({ resetSortType: true });
         this.#renderBoard();
         break;
+      case UpdateTypes.INIT:
+        this.#clearBoard();
+        this.#renderBoard();
     }
   };
 

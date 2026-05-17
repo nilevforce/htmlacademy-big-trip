@@ -1,12 +1,31 @@
-import { eventsMock } from '../mock/events-mock';
-import { offersMock } from '../mock/offers-mock';
-import { destinationsMock } from '../mock/destinations-mock';
 import Observable from '../framework/observable';
+import { UpdateTypes } from '../constants.js';
 
 class EventsModel extends Observable {
-  #events = eventsMock;
-  #offers = offersMock;
-  #destinations = destinationsMock;
+  #events = null;
+  #offers = null;
+  #destinations = null;
+  #eventsApiService = null;
+
+  constructor({ eventsApiService }) {
+    super();
+
+    this.#eventsApiService = eventsApiService;
+  }
+
+  async init() {
+    try {
+      this.#events = await this.#eventsApiService.getEvents();
+      this.#destinations = await this.#eventsApiService.getDestinations();
+      this.#offers = await this.#eventsApiService.getOffers();
+
+      this._notify(UpdateTypes.INIT);
+    } catch (e) {
+      this.#events = [];
+      this.#destinations = [];
+      this.#offers = [];
+    }
+  }
 
   get events() {
     return this.#events.map((event) => ({

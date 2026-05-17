@@ -49,9 +49,20 @@ const UserActions = {
 };
 
 const UpdateTypes = {
+  INIT: 'INIT',
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR'
+};
+
+const ApiMethods = {
+  GET: 'GET'
+};
+
+const ApiEndpoints = {
+  POINTS: 'points',
+  DESTINATIONS: 'destinations',
+  OFFERS: 'offers'
 };
 
 export {
@@ -61,5 +72,7 @@ export {
   FilterTypes,
   SortTypes,
   UserActions,
-  UpdateTypes
+  UpdateTypes,
+  ApiMethods,
+  ApiEndpoints
 };

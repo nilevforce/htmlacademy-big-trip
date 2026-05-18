@@ -110,6 +110,14 @@ const createDestinationSectionTemplate = (destination) => {
   `;
 };
 
+const getResetButtonName = ({ isEdit, isDeleting }) => {
+  if (isDeleting) {
+    return 'Deleting...';
+  }
+
+  return isEdit ? 'Delete' : 'Cancel';
+};
+
 const createEditFormTemplate = ({
   event,
   offers,
@@ -117,7 +125,12 @@ const createEditFormTemplate = ({
 } = {}) => {
   const selectedOfferIds = event.offers?.map((offer) => offer.id);
   const isEdit = !!event.id;
-  const resetButtonName = isEdit ? 'Delete' : 'Cancel';
+  const saveButtonText = event.isSaving ? 'Saving...' : 'Save';
+  const resetButtonName = getResetButtonName({
+    isEdit,
+    isDeleting: event.isDeleting
+  });
+  const disabledAttr = event.isSaving || event.isDeleting ? 'disabled' : '';
 
   return `
     <li class="trip-events__item">
@@ -153,6 +166,7 @@ const createEditFormTemplate = ({
               name="event-destination"
               list="destination-list-1"
               value="${event.destination?.name ? he.encode(event.destination.name) : ''}"
+              ${disabledAttr}
               required
             >
             <datalist id="destination-list-1">
@@ -165,6 +179,7 @@ const createEditFormTemplate = ({
               type="text"
               name="event-start-time"
               value="${event.dateFrom ? formatDate(event.dateFrom, DateFormats.DATE_TIME_INPUT) : ''}"
+              ${disabledAttr}
               required
             >
             —
@@ -173,6 +188,7 @@ const createEditFormTemplate = ({
               type="text"
               name="event-end-time"
               value="${event.dateTo ? formatDate(event.dateTo, DateFormats.DATE_TIME_INPUT) : ''}"
+              ${disabledAttr}
               required
             >
           </div>
@@ -184,12 +200,13 @@ const createEditFormTemplate = ({
               name="event-price"
               value="${event.basePrice ? event.basePrice : 0}"
               min="0"
+              ${disabledAttr}
               required
             >
           </div>
-          <button class="event__save-btn btn btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">${resetButtonName}</button>
-          ${isEdit ? '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Close event</span></button>' : ''}
+          <button class="event__save-btn btn btn--blue" type="submit" ${disabledAttr}>${saveButtonText}</button>
+          <button class="event__reset-btn" type="reset" ${disabledAttr}>${resetButtonName}</button>
+          ${isEdit ? `<button class="event__rollup-btn" type="button" ${disabledAttr}><span class="visually-hidden">Close event</span></button>` : ''}
         </header>
         <section class="event__details">
           ${createOffersSectionTemplate(offers, selectedOfferIds)}
@@ -421,11 +438,17 @@ class EventEditFormView extends AbstractStatefulView {
       dateFrom: event.dateFrom,
       dateTo: event.dateTo,
       isFavorite: event.isFavorite,
+      isSaving: false,
+      isDeleting: false
     };
   }
 
   static parseStateToEvent(state) {
-    return { ...state };
+    const event = { ...state };
+    delete event.isSaving;
+    delete event.isDeleting;
+
+    return event;
   }
 }
 

@@ -2,10 +2,11 @@ import Observable from '../framework/observable';
 import { UpdateTypes } from '../constants.js';
 
 class EventsModel extends Observable {
-  #events = null;
-  #offers = null;
-  #destinations = null;
+  #events = [];
+  #offers = [];
+  #destinations = [];
   #eventsApiService = null;
+  #isFailedLoad = false;
 
   constructor({ eventsApiService }) {
     super();
@@ -15,15 +16,17 @@ class EventsModel extends Observable {
 
   async init() {
     try {
+      this.#isFailedLoad = false;
       this.#events = await this.#eventsApiService.getEvents();
       this.#destinations = await this.#eventsApiService.getDestinations();
       this.#offers = await this.#eventsApiService.getOffers();
-
-      this._notify(UpdateTypes.INIT);
     } catch (e) {
+      this.#isFailedLoad = true;
       this.#events = [];
       this.#destinations = [];
       this.#offers = [];
+    } finally {
+      this._notify(UpdateTypes.INIT);
     }
   }
 
@@ -46,6 +49,10 @@ class EventsModel extends Observable {
 
   get destinations() {
     return this.#destinations;
+  }
+
+  get isFailedLoad() {
+    return this.#isFailedLoad;
   }
 
   async updateEvent(updateType, update) {

@@ -2,22 +2,39 @@ import { remove, render, RenderPosition } from '../framework/render';
 import SortingView from '../view/sorting-view';
 import EventsListView from '../view/events-list-view';
 import EventPresenter from './event-presenter';
-import { FilterTypes, SortTypes, UpdateTypes, UserActions } from '../constants';
+import {
+  FilterTypes,
+  SortTypes,
+  TimeLimit,
+  UpdateTypes,
+  UserActions
+} from '../constants';
 import { sortEventsByDay, sortEventsByPrice, sortEventsByTime } from '../helpers/sorting';
 import { filter } from '../helpers/filter';
 import NoEventsView from '../view/no-events-view';
 import NewEventPresenter from './new-event-presenter';
+import LoadingView from '../view/loading-view';
+import FailedLoadDataView from '../view/failed-load-data-view';
+import UiBlocker from '../framework/ui-blocker/ui-blocker';
 
 class BoardPresenter {
   #eventsListContainer = null;
   #sortingComponent = null;
   #eventsListComponent = new EventsListView();
   #noEventsComponent = null;
+  #loadingComponent = new LoadingView();
+  #failedLoadDataComponent = new FailedLoadDataView();
 
   #eventsModel = null;
   #filterModel = null;
 
   #currentSortType = SortTypes.DAY;
+  #isLoading = true;
+  #isFailedLoad = false;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   #newEventPresenter = null;
   #eventsPresenters = new Map();
@@ -83,6 +100,16 @@ class BoardPresenter {
   #renderBoard() {
     render(this.#eventsListComponent, this.#eventsListContainer);
 
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
+    if (this.#isFailedLoad) {
+      this.#renderFailedLoadData();
+      return;
+    }
+
     const events = this.events;
     const eventsCount = events.length;
 
@@ -107,7 +134,17 @@ class BoardPresenter {
       remove(this.#noEventsComponent);
     }
 
+    remove(this.#loadingComponent);
+    remove(this.#failedLoadDataComponent);
     remove(this.#sortingComponent);
+  }
+
+  #renderLoading() {
+    render(this.#loadingComponent, this.#eventsListContainer, RenderPosition.AFTERBEGIN);
+  }
+
+  #renderFailedLoadData() {
+    render(this.#failedLoadDataComponent, this.#eventsListContainer, RenderPosition.AFTERBEGIN);
   }
 
   #renderSort() {
@@ -154,17 +191,23 @@ class BoardPresenter {
     this.#eventsPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
-    switch (actionType) {
-      case UserActions.ADD_EVENT:
-        this.#eventsModel.addEvent(updateType, update);
-        break;
-      case UserActions.UPDATE_EVENT:
-        this.#eventsModel.updateEvent(updateType, update);
-        break;
-      case UserActions.DELETE_EVENT:
-        this.#eventsModel.deleteEvent(updateType, update);
-        break;
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
+
+    try {
+      switch (actionType) {
+        case UserActions.ADD_EVENT:
+          await this.#eventsModel.addEvent(updateType, update);
+          break;
+        case UserActions.UPDATE_EVENT:
+          await this.#eventsModel.updateEvent(updateType, update);
+          break;
+        case UserActions.DELETE_EVENT:
+          await this.#eventsModel.deleteEvent(updateType, update);
+          break;
+      }
+    } finally {
+      this.#uiBlocker.unblock();
     }
   };
 
@@ -186,8 +229,11 @@ class BoardPresenter {
         this.#renderBoard();
         break;
       case UpdateTypes.INIT:
+        this.#isLoading = false;
+        this.#isFailedLoad = this.#eventsModel.isFailedLoad;
         this.#clearBoard();
         this.#renderBoard();
+        break;
     }
   };
 

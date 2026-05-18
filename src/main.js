@@ -5,6 +5,7 @@ import NewEventButtonView from './view/new-event-button-view';
 import { render } from './framework/render';
 import FilterModel from './model/filter-model';
 import EventsApiService from './service/events-api-service.js';
+import TripInfoPresenter from './presenter/trip-info-presenter';
 
 const siteHeaderElement = document.querySelector('.page-header');
 const siteMainElement = document.querySelector('.page-main');
@@ -21,6 +22,11 @@ const bootstrap = async () => {
   });
 
   const filterModel = new FilterModel();
+
+  new TripInfoPresenter({
+    tripInfoContainer: tripMainElement,
+    eventsModel
+  });
 
   new FilterPresenter({
     filterContainer: filterContainerElement,
@@ -48,6 +54,7 @@ const bootstrap = async () => {
     newEventButtonComponent.element.disabled = true;
   }
 
+  boardPresenter.init();
   await eventsModel.init();
 
   render(newEventButtonComponent, tripMainElement);

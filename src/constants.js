@@ -12,7 +12,10 @@ const DateFormats = {
   DATE_TIME_INPUT: 'DD/MM/YY HH:mm',
   SHORT_DATE: 'MMM DD',
   ISO_DATE: 'YYYY-MM-DD',
-  TIME: 'HH:mm'
+  TIME: 'HH:mm',
+  TRIP_DAY: 'D',
+  TRIP_MONTH: 'MMM',
+  TRIP_DATE: 'D MMM'
 };
 
 const TripEventTypes = {
@@ -68,6 +71,11 @@ const ApiEndpoints = {
   OFFERS: 'offers'
 };
 
+const TimeLimit = {
+  LOWER_LIMIT: 0,
+  UPPER_LIMIT: 1000
+};
+
 export {
   TimeUnits,
   DateFormats,
@@ -77,5 +85,6 @@ export {
   UserActions,
   UpdateTypes,
   ApiMethods,
-  ApiEndpoints
+  ApiEndpoints,
+  TimeLimit
 };

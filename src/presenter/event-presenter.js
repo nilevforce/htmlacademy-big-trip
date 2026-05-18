@@ -104,30 +104,54 @@ class EventPresenter {
     this.#replaceCardToForm();
   };
 
-  #handleFavoriteClick = () => {
-    this.#handleDataChange(
-      UserActions.UPDATE_EVENT,
-      UpdateTypes.MINOR,
-      { ...this.#event, isFavorite: !this.#event.isFavorite }
-    );
+  #handleFavoriteClick = async () => {
+    try {
+      await this.#handleDataChange(
+        UserActions.UPDATE_EVENT,
+        UpdateTypes.MINOR,
+        { ...this.#event, isFavorite: !this.#event.isFavorite }
+      );
+    } catch {
+      this.#eventComponent.shake();
+    }
   };
 
-  #handleFormSubmit = (event) => {
-    this.#replaceFormToCard();
-    this.#handleDataChange(
-      UserActions.UPDATE_EVENT,
-      UpdateTypes.MINOR,
-      event
-    );
+  #handleFormSubmit = async (event) => {
+    this.#eventEditComponent.updateElement({
+      isSaving: true
+    });
+
+    try {
+      await this.#handleDataChange(
+        UserActions.UPDATE_EVENT,
+        UpdateTypes.MINOR,
+        event
+      );
+    } catch {
+      this.#eventEditComponent.updateElement({
+        isSaving: false
+      });
+      this.#eventEditComponent.shake();
+    }
   };
 
-  #handleDeleteClick = (event) => {
-    this.#replaceFormToCard();
-    this.#handleDataChange(
-      UserActions.DELETE_EVENT,
-      UpdateTypes.MAJOR,
-      event
-    );
+  #handleDeleteClick = async (event) => {
+    this.#eventEditComponent.updateElement({
+      isDeleting: true
+    });
+
+    try {
+      await this.#handleDataChange(
+        UserActions.DELETE_EVENT,
+        UpdateTypes.MAJOR,
+        event
+      );
+    } catch {
+      this.#eventEditComponent.updateElement({
+        isDeleting: false
+      });
+      this.#eventEditComponent.shake();
+    }
   };
 
   #handleCloseClick = () => {

@@ -1,6 +1,5 @@
 import EventEditFormView from '../view/event-edit-form-view';
 import { UpdateTypes, UserActions } from '../constants';
-import { nanoid } from 'nanoid';
 import { remove, render, RenderPosition } from '../framework/render';
 
 class NewEventPresenter {
@@ -60,14 +59,25 @@ class NewEventPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
 
-  #handleFormSubmit = (event) => {
-    this.#handleDataChange(
-      UserActions.ADD_EVENT,
-      UpdateTypes.MAJOR,
-      { ...event, id: nanoid() }
-    );
+  #handleFormSubmit = async (event) => {
+    this.#eventEditComponent.updateElement({
+      isSaving: true
+    });
 
-    this.destroy();
+    try {
+      await this.#handleDataChange(
+        UserActions.ADD_EVENT,
+        UpdateTypes.MAJOR,
+        { ...event }
+      );
+
+      this.destroy();
+    } catch {
+      this.#eventEditComponent.updateElement({
+        isSaving: false
+      });
+      this.#eventEditComponent.shake();
+    }
   };
 
   #handleDeleteClick = () => {

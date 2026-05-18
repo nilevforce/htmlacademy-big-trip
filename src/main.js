@@ -46,12 +46,12 @@ const bootstrap = async () => {
   });
 
   function handleNewEventFormClose() {
-    newEventButtonComponent.element.disabled = false;
+    newEventButtonComponent.setDisabled(false);
   }
 
   function handleNewEventButtonClick() {
     boardPresenter.createEvent();
-    newEventButtonComponent.element.disabled = true;
+    newEventButtonComponent.setDisabled(true);
   }
 
   boardPresenter.init();

@@ -1,5 +1,5 @@
 import Observable from '../framework/observable';
-import { UpdateTypes } from '../constants.js';
+import { UpdateType } from '../constants.js';
 
 class EventsModel extends Observable {
   #events = [];
@@ -26,7 +26,7 @@ class EventsModel extends Observable {
       this.#destinations = [];
       this.#offers = [];
     } finally {
-      this._notify(UpdateTypes.INIT);
+      this._notify(UpdateType.INIT);
     }
   }
 

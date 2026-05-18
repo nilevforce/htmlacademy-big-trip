@@ -1,5 +1,5 @@
 import EventEditFormView from '../view/event-edit-form-view';
-import { UpdateTypes, UserActions } from '../constants';
+import { UpdateType, UserAction } from '../constants';
 import { remove, render, RenderPosition } from '../framework/render';
 
 class NewEventPresenter {
@@ -66,8 +66,8 @@ class NewEventPresenter {
 
     try {
       await this.#handleDataChange(
-        UserActions.ADD_EVENT,
-        UpdateTypes.MAJOR,
+        UserAction.ADD_EVENT,
+        UpdateType.MAJOR,
         { ...event }
       );
 

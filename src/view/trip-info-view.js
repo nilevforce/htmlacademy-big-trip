@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import { DateFormats } from '../constants';
+import { DateFormat } from '../constants';
 import { formatDate } from '../helpers/times';
 
 const MAX_DESTINATIONS_COUNT = 3;
@@ -17,17 +17,17 @@ const createRouteTitle = (events) => {
 const createTripDates = (events) => {
   const firstEvent = events.at(0);
   const lastEvent = events.at(-1);
-  const dateFrom = formatDate(firstEvent.dateFrom, DateFormats.TRIP_DATE);
-  const dateTo = formatDate(lastEvent.dateTo, DateFormats.TRIP_DATE);
-  const monthFrom = formatDate(firstEvent.dateFrom, DateFormats.TRIP_MONTH);
-  const monthTo = formatDate(lastEvent.dateTo, DateFormats.TRIP_MONTH);
+  const dateFrom = formatDate(firstEvent.dateFrom, DateFormat.TRIP_DATE);
+  const dateTo = formatDate(lastEvent.dateTo, DateFormat.TRIP_DATE);
+  const monthFrom = formatDate(firstEvent.dateFrom, DateFormat.TRIP_MONTH);
+  const monthTo = formatDate(lastEvent.dateTo, DateFormat.TRIP_MONTH);
 
   if (dateFrom === dateTo) {
     return dateFrom;
   }
 
   if (monthFrom === monthTo) {
-    return `${formatDate(firstEvent.dateFrom, DateFormats.TRIP_DAY)}&nbsp;&mdash;&nbsp;${dateTo}`;
+    return `${formatDate(firstEvent.dateFrom, DateFormat.TRIP_DAY)}&nbsp;&mdash;&nbsp;${dateTo}`;
   }
 
   return `${dateFrom}&nbsp;&mdash;&nbsp;${dateTo}`;

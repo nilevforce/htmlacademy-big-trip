@@ -3,11 +3,11 @@ import SortingView from '../view/sorting-view';
 import EventsListView from '../view/events-list-view';
 import EventPresenter from './event-presenter';
 import {
-  FilterTypes,
-  SortTypes,
+  FilterType,
+  SortType,
   TimeLimit,
-  UpdateTypes,
-  UserActions
+  UpdateType,
+  UserAction
 } from '../constants';
 import { sortEventsByDay, sortEventsByPrice, sortEventsByTime } from '../helpers/sorting';
 import { filter } from '../helpers/filter';
@@ -28,7 +28,7 @@ class BoardPresenter {
   #eventsModel = null;
   #filterModel = null;
 
-  #currentSortType = SortTypes.DAY;
+  #currentSortType = SortType.DAY;
   #isLoading = true;
   #isFailedLoad = false;
   #uiBlocker = new UiBlocker({
@@ -65,11 +65,11 @@ class BoardPresenter {
     const filteredEvents = filter[filterType](events);
 
     switch (this.#currentSortType) {
-      case SortTypes.DAY:
+      case SortType.DAY:
         return filteredEvents.sort(sortEventsByDay);
-      case SortTypes.TIME:
+      case SortType.TIME:
         return filteredEvents.sort(sortEventsByTime);
-      case SortTypes.PRICE:
+      case SortType.PRICE:
         return filteredEvents.sort(sortEventsByPrice);
       default:
         return filteredEvents.sort(sortEventsByDay);
@@ -89,8 +89,8 @@ class BoardPresenter {
   }
 
   createEvent() {
-    this.#currentSortType = SortTypes.DAY;
-    this.#filterModel.setFilter(UpdateTypes.MAJOR, FilterTypes.EVERYTHING);
+    this.#currentSortType = SortType.DAY;
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#newEventPresenter.init({
       offers: this.offers,
       destinations: this.destinations
@@ -127,7 +127,7 @@ class BoardPresenter {
     this.#eventsPresenters.clear();
 
     if (resetSortType) {
-      this.#currentSortType = SortTypes.DAY;
+      this.#currentSortType = SortType.DAY;
     }
 
     if (this.#noEventsComponent) {
@@ -196,13 +196,13 @@ class BoardPresenter {
 
     try {
       switch (actionType) {
-        case UserActions.ADD_EVENT:
+        case UserAction.ADD_EVENT:
           await this.#eventsModel.addEvent(updateType, update);
           break;
-        case UserActions.UPDATE_EVENT:
+        case UserAction.UPDATE_EVENT:
           await this.#eventsModel.updateEvent(updateType, update);
           break;
-        case UserActions.DELETE_EVENT:
+        case UserAction.DELETE_EVENT:
           await this.#eventsModel.deleteEvent(updateType, update);
           break;
       }
@@ -213,22 +213,22 @@ class BoardPresenter {
 
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
-      case UpdateTypes.PATCH:
+      case UpdateType.PATCH:
         this.#eventsPresenters.get(data.id).init({
           event: data,
           offers: this.offers,
           destinations: this.destinations
         });
         break;
-      case UpdateTypes.MINOR:
+      case UpdateType.MINOR:
         this.#clearBoard();
         this.#renderBoard();
         break;
-      case UpdateTypes.MAJOR:
+      case UpdateType.MAJOR:
         this.#clearBoard({ resetSortType: true });
         this.#renderBoard();
         break;
-      case UpdateTypes.INIT:
+      case UpdateType.INIT:
         this.#isLoading = false;
         this.#isFailedLoad = this.#eventsModel.isFailedLoad;
         this.#clearBoard();
@@ -242,7 +242,7 @@ class BoardPresenter {
       return;
     }
 
-    this.#currentSortType = SortTypes[sortType];
+    this.#currentSortType = SortType[sortType];
 
     this.#clearBoard();
     this.#renderBoard();

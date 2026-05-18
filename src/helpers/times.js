@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
-import { TimeUnits } from '../constants';
+import { TimeUnit } from '../constants';
 
 const MINUTES_IN_DAY = 1440;
 const MINUTES_IN_HOUR = 60;
@@ -22,7 +22,7 @@ const formatDuration = (dateFrom, dateTo) => {
   const start = dayjs(dateFrom);
   const end = dayjs(dateTo);
 
-  const totalMinutes = end.diff(start, TimeUnits.MINUTE);
+  const totalMinutes = end.diff(start, TimeUnit.MINUTE);
 
   const days = String(
     Math.floor(totalMinutes / MINUTES_IN_DAY)

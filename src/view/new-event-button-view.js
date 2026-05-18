@@ -19,6 +19,10 @@ class NewEventButtonView extends AbstractView {
     return createNewEventButtonTemplate();
   }
 
+  setDisabled(isDisabled) {
+    this.element.disabled = isDisabled;
+  }
+
   #clickHandler = (evt) => {
     evt.preventDefault();
     this.#handleButtonClick();

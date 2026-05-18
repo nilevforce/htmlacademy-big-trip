@@ -1,4 +1,4 @@
-const TimeUnits = {
+const TimeUnit = {
   SECOND: 'second',
   MINUTE: 'minute',
   HOUR: 'hour',
@@ -8,7 +8,7 @@ const TimeUnits = {
   YEAR: 'year',
 };
 
-const DateFormats = {
+const DateFormat = {
   DATE_TIME_INPUT: 'DD/MM/YY HH:mm',
   SHORT_DATE: 'MMM DD',
   ISO_DATE: 'YYYY-MM-DD',
@@ -18,7 +18,7 @@ const DateFormats = {
   TRIP_DATE: 'D MMM'
 };
 
-const TripEventTypes = {
+const TripEventType = {
   TAXI: 'taxi',
   BUS: 'bus',
   TRAIN: 'train',
@@ -30,14 +30,14 @@ const TripEventTypes = {
   RESTAURANT: 'restaurant'
 };
 
-const FilterTypes = {
+const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
   PRESENT: 'present',
   PAST: 'past'
 };
 
-const SortTypes = {
+const SortType = {
   DAY: 'DAY',
   EVENT: 'EVENT',
   TIME: 'TIME',
@@ -45,27 +45,27 @@ const SortTypes = {
   OFFERS: 'OFFERS'
 };
 
-const UserActions = {
+const UserAction = {
   ADD_EVENT: 'ADD_EVENT',
   UPDATE_EVENT: 'UPDATE_EVENT',
   DELETE_EVENT: 'DELETE_EVENT'
 };
 
-const UpdateTypes = {
+const UpdateType = {
   INIT: 'INIT',
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR'
 };
 
-const ApiMethods = {
+const ApiMethod = {
   GET: 'GET',
   POST: 'POST',
   PUT: 'PUT',
   DELETE: 'DELETE'
 };
 
-const ApiEndpoints = {
+const ApiEndpoint = {
   POINTS: 'points',
   DESTINATIONS: 'destinations',
   OFFERS: 'offers'
@@ -77,14 +77,14 @@ const TimeLimit = {
 };
 
 export {
-  TimeUnits,
-  DateFormats,
-  TripEventTypes,
-  FilterTypes,
-  SortTypes,
-  UserActions,
-  UpdateTypes,
-  ApiMethods,
-  ApiEndpoints,
+  TimeUnit,
+  DateFormat,
+  TripEventType,
+  FilterType,
+  SortType,
+  UserAction,
+  UpdateType,
+  ApiMethod,
+  ApiEndpoint,
   TimeLimit
 };

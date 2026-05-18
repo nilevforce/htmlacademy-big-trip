@@ -1,21 +1,31 @@
 import he from 'he';
+import dayjs from 'dayjs';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
-import { DateFormats, TripEventTypes } from '../constants';
+import { DateFormat, TimeUnit, TripEventType } from '../constants';
 import { capitalizeFirstLetter, toSlug } from '../helpers/common';
 import { formatDate } from '../helpers/times';
 
-const BLANK_EVENT = {
+const DEFAULT_EVENT_DURATION_DAYS = 7;
+const MIN_EVENT_PRICE = 1;
+
+const getDefaultDateFrom = () => new Date();
+
+const getDefaultDateTo = () => dayjs()
+  .add(DEFAULT_EVENT_DURATION_DAYS, TimeUnit.DAY)
+  .toDate();
+
+const createBlankEvent = () => ({
   id: null,
   basePrice: 0,
-  dateFrom: null,
-  dateTo: null,
+  dateFrom: getDefaultDateFrom(),
+  dateTo: getDefaultDateTo(),
   destination: null,
   isFavorite: false,
   offers: [],
-  type: TripEventTypes.FLIGHT
-};
+  type: TripEventType.FLIGHT
+});
 
 const createEventTypeItemTemplate = (type, currentType) => {
   const checkedAttr = type === currentType ? 'checked' : '';
@@ -151,7 +161,7 @@ const createEditFormTemplate = ({
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-                ${Object.values(TripEventTypes).map((value) => createEventTypeItemTemplate(value, event.type)).join('')}
+                ${Object.values(TripEventType).map((value) => createEventTypeItemTemplate(value, event.type)).join('')}
               </fieldset>
             </div>
           </div>
@@ -178,7 +188,7 @@ const createEditFormTemplate = ({
               class="event__input event__input--time"
               type="text"
               name="event-start-time"
-              value="${event.dateFrom ? formatDate(event.dateFrom, DateFormats.DATE_TIME_INPUT) : ''}"
+              value="${event.dateFrom ? formatDate(event.dateFrom, DateFormat.DATE_TIME_INPUT) : ''}"
               ${disabledAttr}
               required
             >
@@ -187,7 +197,7 @@ const createEditFormTemplate = ({
               class="event__input event__input--time"
               type="text"
               name="event-end-time"
-              value="${event.dateTo ? formatDate(event.dateTo, DateFormats.DATE_TIME_INPUT) : ''}"
+              value="${event.dateTo ? formatDate(event.dateTo, DateFormat.DATE_TIME_INPUT) : ''}"
               ${disabledAttr}
               required
             >
@@ -198,8 +208,9 @@ const createEditFormTemplate = ({
               class="event__input event__input--price"
               type="number"
               name="event-price"
-              value="${event.basePrice ? event.basePrice : 0}"
-              min="0"
+              value="${event.basePrice || ''}"
+              min="${MIN_EVENT_PRICE}"
+              step="1"
               ${disabledAttr}
               required
             >
@@ -230,7 +241,7 @@ class EventEditFormView extends AbstractStatefulView {
   #datepickerTo = null;
 
   constructor({
-    event = BLANK_EVENT,
+    event = createBlankEvent(),
     offers,
     destinations,
     onFormSubmit,
@@ -253,11 +264,10 @@ class EventEditFormView extends AbstractStatefulView {
   }
 
   _restoreHandlers() {
-    this.element.querySelector('.event--edit')
-      .addEventListener('submit', this.#formSubmitHandler);
+    const formElement = this.element.querySelector('.event--edit');
 
-    this.element.querySelector('.event--edit')
-      .addEventListener('reset', this.#formResetHandler);
+    formElement.addEventListener('submit', this.#formSubmitHandler);
+    formElement.addEventListener('reset', this.#formResetHandler);
 
     const rollupButton = this.element.querySelector('.event__rollup-btn');
     if (rollupButton) {
@@ -387,11 +397,17 @@ class EventEditFormView extends AbstractStatefulView {
   };
 
   #dateFromChangeHandler = ([date]) => {
+    const dateTo = dayjs(this._state.dateTo).isBefore(date)
+      ? date
+      : this._state.dateTo;
+
     this._setState({
-      dateFrom: date
+      dateFrom: date,
+      dateTo
     });
 
     this.#datepickerTo.set('minDate', date);
+    this.#datepickerTo.setDate(dateTo);
   };
 
   #dateToChangeHandler = ([date]) => {
@@ -406,6 +422,7 @@ class EventEditFormView extends AbstractStatefulView {
       {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.dateFrom,
         onChange: this.#dateFromChangeHandler,
       },
     );
@@ -415,6 +432,7 @@ class EventEditFormView extends AbstractStatefulView {
       {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.dateTo,
         minDate: this._state.dateFrom,
         onChange: this.#dateToChangeHandler,
       },
@@ -434,9 +452,9 @@ class EventEditFormView extends AbstractStatefulView {
       type: event.type,
       destination: event.destination,
       offers: event.offers,
-      basePrice: event.basePrice,
-      dateFrom: event.dateFrom,
-      dateTo: event.dateTo,
+      basePrice: event.basePrice ?? 0,
+      dateFrom: event.dateFrom ?? getDefaultDateFrom(),
+      dateTo: event.dateTo ?? getDefaultDateTo(),
       isFavorite: event.isFavorite,
       isSaving: false,
       isDeleting: false

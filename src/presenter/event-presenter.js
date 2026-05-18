@@ -1,7 +1,7 @@
 import EventItemView from '../view/event-item-view';
 import EventEditFormView from '../view/event-edit-form-view';
 import { remove, render, replace } from '../framework/render';
-import { UpdateTypes, UserActions } from '../constants';
+import { UpdateType, UserAction } from '../constants';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -107,8 +107,8 @@ class EventPresenter {
   #handleFavoriteClick = async () => {
     try {
       await this.#handleDataChange(
-        UserActions.UPDATE_EVENT,
-        UpdateTypes.MINOR,
+        UserAction.UPDATE_EVENT,
+        UpdateType.MINOR,
         { ...this.#event, isFavorite: !this.#event.isFavorite }
       );
     } catch {
@@ -123,8 +123,8 @@ class EventPresenter {
 
     try {
       await this.#handleDataChange(
-        UserActions.UPDATE_EVENT,
-        UpdateTypes.MINOR,
+        UserAction.UPDATE_EVENT,
+        UpdateType.MINOR,
         event
       );
     } catch {
@@ -142,8 +142,8 @@ class EventPresenter {
 
     try {
       await this.#handleDataChange(
-        UserActions.DELETE_EVENT,
-        UpdateTypes.MAJOR,
+        UserAction.DELETE_EVENT,
+        UpdateType.MAJOR,
         event
       );
     } catch {

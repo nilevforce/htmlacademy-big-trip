@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import { DateFormats } from '../constants';
+import { DateFormat } from '../constants';
 import { formatDate, formatDuration } from '../helpers/times';
 
 const createOffersTemplate = (offers) => {
@@ -31,10 +31,10 @@ const createItemTemplate = (event) => {
     name: destinationName
   } = event.destination;
 
-  const dateFromShortDate = formatDate(dateFrom, DateFormats.SHORT_DATE);
-  const dateFromIsoDate = formatDate(dateFrom, DateFormats.ISO_DATE);
-  const dateFromTime = formatDate(dateFrom, DateFormats.TIME);
-  const dateToTime = formatDate(dateTo, DateFormats.TIME);
+  const dateFromShortDate = formatDate(dateFrom, DateFormat.SHORT_DATE);
+  const dateFromIsoDate = formatDate(dateFrom, DateFormat.ISO_DATE);
+  const dateFromTime = formatDate(dateFrom, DateFormat.TIME);
+  const dateToTime = formatDate(dateTo, DateFormat.TIME);
   const duration = formatDuration(dateFrom, dateTo);
 
   const favoriteButtonClassName = isFavorite

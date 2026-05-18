@@ -1,15 +1,15 @@
 import AbstractView from '../framework/view/abstract-view';
-import { FilterTypes } from '../constants';
+import { FilterType } from '../constants';
 
-const NoEventsTextTypes = {
-  [FilterTypes.EVERYTHING]: 'Click New Event to create your first point',
-  [FilterTypes.PAST]: 'There are no past events now',
-  [FilterTypes.PRESENT]: 'There are no present events now',
-  [FilterTypes.FUTURE]: 'There are no future events now'
+const NoEventText = {
+  [FilterType.EVERYTHING]: 'Click New Event to create your first point',
+  [FilterType.PAST]: 'There are no past events now',
+  [FilterType.PRESENT]: 'There are no present events now',
+  [FilterType.FUTURE]: 'There are no future events now'
 };
 
 const createNoEventsTemplate = ({ filterType }) => {
-  const noEventsText = NoEventsTextTypes[filterType];
+  const noEventsText = NoEventText[filterType];
 
   return `<p class="trip-events__msg">${noEventsText}</p>`;
 };

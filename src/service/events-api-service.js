@@ -1,11 +1,11 @@
 import ApiService from '../framework/api-service.js';
-import { ApiEndpoints, ApiMethods } from '../constants.js';
+import { ApiEndpoint, ApiMethod } from '../constants.js';
 
 class EventsApiService extends ApiService {
   async getEvents() {
     const response = await this._load({
-      url: ApiEndpoints.POINTS,
-      method: ApiMethods.GET
+      url: ApiEndpoint.POINTS,
+      method: ApiMethod.GET
     });
 
     const events = await ApiService.parseResponse(response);
@@ -15,8 +15,8 @@ class EventsApiService extends ApiService {
 
   async getDestinations() {
     const response = await this._load({
-      url: ApiEndpoints.DESTINATIONS,
-      method: ApiMethods.GET
+      url: ApiEndpoint.DESTINATIONS,
+      method: ApiMethod.GET
     });
 
     const destinations = await ApiService.parseResponse(response);
@@ -26,8 +26,8 @@ class EventsApiService extends ApiService {
 
   async getOffers() {
     const response = await this._load({
-      url: ApiEndpoints.OFFERS,
-      method: ApiMethods.GET
+      url: ApiEndpoint.OFFERS,
+      method: ApiMethod.GET
     });
 
     const offers = await ApiService.parseResponse(response);
@@ -37,8 +37,8 @@ class EventsApiService extends ApiService {
 
   async updateEvent(event) {
     const response = await this._load({
-      url: `${ApiEndpoints.POINTS}/${event.id}`,
-      method: ApiMethods.PUT,
+      url: `${ApiEndpoint.POINTS}/${event.id}`,
+      method: ApiMethod.PUT,
       body: JSON.stringify(this.#adaptEventToServer(event)),
       headers: new Headers({'Content-Type': 'application/json'})
     });
@@ -50,8 +50,8 @@ class EventsApiService extends ApiService {
 
   async addEvent(event) {
     const response = await this._load({
-      url: ApiEndpoints.POINTS,
-      method: ApiMethods.POST,
+      url: ApiEndpoint.POINTS,
+      method: ApiMethod.POST,
       body: JSON.stringify(this.#adaptEventToServer(event)),
       headers: new Headers({'Content-Type': 'application/json'})
     });
@@ -63,8 +63,8 @@ class EventsApiService extends ApiService {
 
   async deleteEvent(eventId) {
     return await this._load({
-      url: `${ApiEndpoints.POINTS}/${eventId}`,
-      method: ApiMethods.DELETE,
+      url: `${ApiEndpoint.POINTS}/${eventId}`,
+      method: ApiMethod.DELETE,
     });
   }
 
